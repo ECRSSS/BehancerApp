@@ -1,6 +1,7 @@
 package com.elegion.test.behancer.ui.profile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +20,8 @@ import com.elegion.test.behancer.common.PresenterFragment;
 import com.elegion.test.behancer.data.model.user.User;
 import com.elegion.test.behancer.data.model.user.UserResponse;
 import com.elegion.test.behancer.ui.projects.ProjectsPresenter;
+import com.elegion.test.behancer.ui.usersProjects.UserProjectsActivity;
+import com.elegion.test.behancer.ui.usersProjects.UserProjectsFragment;
 import com.elegion.test.behancer.utils.ApiUtils;
 import com.elegion.test.behancer.utils.DateUtils;
 import com.elegion.test.behancer.common.RefreshOwner;
@@ -48,12 +52,15 @@ public class ProfileFragment extends PresenterFragment implements Refreshable, P
     private TextView mProfileName;
     private TextView mProfileCreatedOn;
     private TextView mProfileLocation;
+
+    private Button mUsersProjectsButton;
+
     @InjectPresenter
     ProfilePresenter mProfilePresenter;
 
     @ProvidePresenter
     ProfilePresenter providePresenter(){
-       return mProfilePresenter = new ProfilePresenter(this, mStorage);
+       return new ProfilePresenter(mStorage);
     }
 
     @Override
@@ -90,6 +97,9 @@ public class ProfileFragment extends PresenterFragment implements Refreshable, P
         mProfileName = view.findViewById(R.id.tv_display_name_details);
         mProfileCreatedOn = view.findViewById(R.id.tv_created_on_details);
         mProfileLocation = view.findViewById(R.id.tv_location_details);
+
+        mUsersProjectsButton = view.findViewById(R.id.btn_user_projects);
+        mUsersProjectsButton.setOnClickListener(view1 -> mProfilePresenter.openProfileFragment(mUsername));
     }
 
     @Override
@@ -115,16 +125,6 @@ public class ProfileFragment extends PresenterFragment implements Refreshable, P
         mProfilePresenter.getProfile(mUsername);
     }
 
-    @Override
-    public void bind(User user) {
-        Picasso.with(getContext())
-                .load(user.getImage().getPhotoUrl())
-                .fit()
-                .into(mProfileImage);
-        mProfileName.setText(user.getDisplayName());
-        mProfileCreatedOn.setText(DateUtils.format(user.getCreatedOn()));
-        mProfileLocation.setText(user.getLocation());
-    }
 
     @Override
     public void onDetach() {
@@ -150,9 +150,25 @@ public class ProfileFragment extends PresenterFragment implements Refreshable, P
     }
 
     @Override
-    public User showProfile(UserResponse response) {
+    public void showProfile(UserResponse response) {
         mErrorView.setVisibility(View.GONE);
         mProfileView.setVisibility(View.VISIBLE);
-        return response.getUser();
+        User user=response.getUser();
+        Picasso.with(getContext())
+                .load(user.getImage().getPhotoUrl())
+                .fit()
+                .into(mProfileImage);
+        mProfileName.setText(user.getDisplayName());
+        mProfileCreatedOn.setText(DateUtils.format(user.getCreatedOn()));
+        mProfileLocation.setText(user.getLocation());
+    }
+
+    @Override
+    public void openProfileFragment(String username) {
+        Intent intent = new Intent(getActivity(), UserProjectsActivity.class);
+        Bundle args = new Bundle();
+        args.putString(UserProjectsFragment.USER_PROJECTS_KEY, username);
+        intent.putExtra(UserProjectsActivity.USERNAME_KEY, args);
+        startActivity(intent);
     }
 }

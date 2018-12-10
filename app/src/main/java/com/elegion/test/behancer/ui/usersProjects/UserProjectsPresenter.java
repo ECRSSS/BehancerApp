@@ -1,29 +1,25 @@
-package com.elegion.test.behancer.ui.projects;
+package com.elegion.test.behancer.ui.usersProjects;
 
 import com.arellomobile.mvp.InjectViewState;
-import com.elegion.test.behancer.BuildConfig;
 import com.elegion.test.behancer.common.BasePresenter;
-import com.elegion.test.behancer.utils.ApiUtils;
 import com.elegion.test.behancer.data.Storage;
+import com.elegion.test.behancer.utils.ApiUtils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-/**
- * Created by Vladislav Falzan.
- */
 @InjectViewState
-public class ProjectsPresenter extends BasePresenter<ProjectsView> {
+public class UserProjectsPresenter extends BasePresenter<UserProjectsView> {
 
     private final Storage mStorage;
 
-    public ProjectsPresenter(Storage storage) {
+    public UserProjectsPresenter(Storage storage) {
         mStorage = storage;
     }
 
-    public void getProjects() {
+    public void getProjects(String username) {
         mCompositeDisposable.add(
-                ApiUtils.getApiService().getProjects(BuildConfig.API_QUERY)
+                ApiUtils.getApiService().getUsersProjects(username)
                         .subscribeOn(Schedulers.io())
                         .doOnSuccess(mStorage::insertProjects)
                         .onErrorReturn(throwable ->
@@ -35,9 +31,5 @@ public class ProjectsPresenter extends BasePresenter<ProjectsView> {
                                 response -> getViewState().showProjects(response.getProjects()),
                                 throwable -> getViewState().showError())
         );
-    }
-
-    public void openProfileFragment(String username) {
-        getViewState().openProfileFragment(username);
     }
 }

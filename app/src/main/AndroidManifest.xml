@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.profile.ProfileActivity" />
+        <activity android:name=".ui.usersProjects.UserProjectsActivity"/>
     </application>
 
 </manifest>

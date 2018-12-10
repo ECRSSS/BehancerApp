@@ -1,11 +1,12 @@
 package com.elegion.test.behancer.ui.profile;
 
 import com.elegion.test.behancer.common.BaseView;
-import com.elegion.test.behancer.data.model.user.User;
 import com.elegion.test.behancer.data.model.user.UserResponse;
+
+import io.reactivex.annotations.NonNull;
 
 public interface ProfileView extends BaseView {
 
-    User showProfile(UserResponse response);
-    void bind(User user);
+    void showProfile(UserResponse response);
+    void openProfileFragment(@NonNull String username);
 }

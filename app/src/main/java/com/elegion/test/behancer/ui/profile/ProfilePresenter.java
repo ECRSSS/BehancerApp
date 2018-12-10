@@ -1,6 +1,7 @@
 package com.elegion.test.behancer.ui.profile;
 
 
+import com.arellomobile.mvp.InjectViewState;
 import com.elegion.test.behancer.common.BasePresenter;
 import com.elegion.test.behancer.data.Storage;
 import com.elegion.test.behancer.data.model.user.User;
@@ -10,13 +11,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.schedulers.Schedulers;
 
+@InjectViewState
 public class ProfilePresenter extends BasePresenter<ProfileView> {
 
-    private final ProfileView profileView;
     private final Storage mStorage;
 
-    public ProfilePresenter(ProfileView profileView, Storage mStorage) {
-        this.profileView = profileView;
+    public ProfilePresenter(Storage mStorage) {
         this.mStorage = mStorage;
     }
 
@@ -29,16 +29,18 @@ public class ProfilePresenter extends BasePresenter<ProfileView> {
                                 mStorage.getUser(mUsername) :
                                 null)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> profileView.showRefresh())
-                .doFinally(() -> profileView.hideRefresh())
+                .doOnSubscribe(disposable -> getViewState().showRefresh())
+                .doFinally(() -> getViewState().hideRefresh())
                 .subscribe(
                         response -> {
-                            User user=profileView.showProfile(response);
-                            profileView.bind(user);
-
+                            getViewState().showProfile(response);
                         },
                         throwable -> {
-                            profileView.showError();
+                            getViewState().showError();
                         }));
+    }
+
+    public void openProfileFragment(String username) {
+        getViewState().openProfileFragment(username);
     }
 }
