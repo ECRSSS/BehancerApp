@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.elegion.test.behancer.R;
 import com.elegion.test.behancer.common.PresenterFragment;
 import com.elegion.test.behancer.data.model.user.User;
@@ -31,12 +33,8 @@ import io.reactivex.schedulers.Schedulers;
  * Created by Vladislav Falzan.
  */
 
-public class ProfileFragment extends PresenterFragment<ProfilePresenter> implements Refreshable, ProfileView {
+public class ProfileFragment extends PresenterFragment implements Refreshable, ProfileView {
 
-    @Override
-    protected ProfilePresenter getPresenter() {
-        return mProfilePresenter;
-    }
 
     public static final String PROFILE_KEY = "PROFILE_KEY";
 
@@ -50,7 +48,18 @@ public class ProfileFragment extends PresenterFragment<ProfilePresenter> impleme
     private TextView mProfileName;
     private TextView mProfileCreatedOn;
     private TextView mProfileLocation;
-    private ProfilePresenter mProfilePresenter;
+    @InjectPresenter
+    ProfilePresenter mProfilePresenter;
+
+    @ProvidePresenter
+    ProfilePresenter providePresenter(){
+       return mProfilePresenter = new ProfilePresenter(this, mStorage);
+    }
+
+    @Override
+    protected ProfilePresenter getPresenter() {
+        return mProfilePresenter;
+    }
 
     public static ProfileFragment newInstance(Bundle args) {
         ProfileFragment fragment = new ProfileFragment();
@@ -86,7 +95,6 @@ public class ProfileFragment extends PresenterFragment<ProfilePresenter> impleme
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mProfilePresenter = new ProfilePresenter(this, mStorage);
 
 
         if (getArguments() != null) {

@@ -10,7 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.schedulers.Schedulers;
 
-public class ProfilePresenter extends BasePresenter {
+public class ProfilePresenter extends BasePresenter<ProfileView> {
 
     private final ProfileView profileView;
     private final Storage mStorage;
